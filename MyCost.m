@@ -41,12 +41,12 @@ function cost=MyCost(sol,model,varmax)
     rmax = varmax.r;
     for i = 1:N-1
         diff = [x_all(i+1) - x_all(i);y_all(i+1) - y_all(i);z_abs(i+1) - z_abs(i)];
-        if norm(diff)>rmax
-            J1 = J_inf;
-        else
-            J1 = J1 + norm(diff);
-        end
-%         J1 = J1 + norm(diff);
+%         if norm(diff)>rmax
+%             J1 = J_inf;
+%         else
+%             J1 = J1 + norm(diff);
+%         end
+        J1 = J1 + norm(diff);
     end
 
     %==============================================

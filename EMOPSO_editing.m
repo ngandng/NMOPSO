@@ -7,7 +7,7 @@ close all;
 addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Model');
 addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Initial Position');
 
-model = CreateModel5(); % Create search map and parameters
+model = CreateModel2(); % Create search map and parameters
 
 nVar=model.n;       % Number of Decision Variables = searching dimension of PSO = number of path nodes
 
@@ -25,7 +25,8 @@ VarMax.r=2*norm(model.start-model.end)/nVar;  % r is distance
 VarMin.r=0;
 
 % Inclination (elevation)
-AngleRange = pi/4; % Limit the angle range for better solutions
+% AngleRange = pi/4; % Limit the angle range for better solutions
+AngleRange = pi;
 VarMin.psi=-AngleRange;            
 VarMax.psi=AngleRange;          
 
@@ -48,7 +49,7 @@ CostFunction=@(x) MyCost(x,model,VarMax);    % Cost Function
 
 nObj = 4;           % object number
 
-MaxIt = 10000;          % Maximum Number of Iterations
+MaxIt = 5000;          % Maximum Number of Iterations
 
 nPop=100;           % Population Size (Swarm Size)
 
@@ -65,8 +66,8 @@ alpha = 0.1;          % Inflation Rate
 beta = 2;             % Leader Selection Pressure
 gamma = 2;            % Deletion Selection Pressure
 
-mu = 0.1;             % Mutation Rate
-delta = 5;
+mu = 1;             % Mutation Rate: higher mu lead to higher mutation probability
+delta = 1;
 
 %% Initialization
 
@@ -86,11 +87,13 @@ GlobalBest.Cost=Inf(nObj,1); % Minimization problem
 % Create an empty Particles Matrix, each particle is a solution (searching path)
 particle=repmat(empty_particle,nPop,1);
 
+useMu = 0;
+
 % Addition control parameter
-loadVar = true;
+loadVar = false;
 
 if loadVar
-    loadValue = load('InitParticles5.mat'); 
+    loadValue = load('InitParticles6.mat'); 
     for i=1:nPop
         
         % Position
@@ -248,14 +251,15 @@ for it=1:MaxIt
         particle(i).Cost=CostFunction(SphericalToCart2(particle(i).Position,model));
         
         %------ Apply mutation-------
-        pm = (1-(it-1)/(MaxIt-1))^(1/mu);
+        unique_rep = unique([rep.GridIndex]);
+        pm = (1-(numel(unique_rep)-1)/(numel(rep)-1))^(1/mu); 
         if rand<pm
-            NewSol.Position = Mutate(particle(i),rep,delta,VarMin,VarMax);
+            NewSol.Position = Mutate(particle(i),pm,delta,VarMin,VarMax);
             NewSol.Cost = CostFunction(SphericalToCart2(NewSol.Position,model));
             if Dominates(NewSol, particle(i))
                 particle(i).Position = NewSol.Position;
                 particle(i).Cost = NewSol.Cost;
-                
+                useMu = useMu+1;                
             elseif Dominates(particle(i),NewSol)
                 %do nothing
                 
@@ -330,6 +334,8 @@ disp('Best solution...');
 smooth = 0.95;
 %smooth = 1;
 PlotSolution(BestPosition,model,smooth);
+
+% save ('MOSPSO_Rep2.mat','rep');
 
 % Best cost  
 %figure;

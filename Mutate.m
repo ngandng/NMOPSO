@@ -1,11 +1,9 @@
-function xnew = Mutate(x,rep,delta,VarMax,VarMin)
+function xnew = Mutate(x,pm,delta,VarMax,VarMin)
 
     nVar = numel(x.Position.r);
     pbest = x.Best;
     
-    index = unique([rep.GridIndex]);
-    
-    beta = tanh(delta/length(index)); % alpha/F in reference
+    beta = tanh(delta*length(pm)); % alpha/F in reference
 
 %     if(rand<beta)
         

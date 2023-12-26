@@ -3,9 +3,9 @@ clear;
 close all;
 
 %% Problem Definition
-addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Model');
-addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Initial Position');
-model = CreateModel5(); % Create search map and parameters
+addpath('C:\Users\Ngan\OneDrive\Desktop\UAV Path planning\Comparision\Model');
+addpath('C:\Users\Ngan\OneDrive\Desktop\UAV Path planning\Comparision\Initial Position');
+model = CreateModel2(); % Create search map and parameters
 % (in comparision: using model 2,3,5,6)
 
 nVar=model.n;       % Number of Decision Variables = searching dimension of PSO = number of path nodes
@@ -92,7 +92,7 @@ particle=repmat(empty_particle,nPop,1);
 loadVar = true;
 
 if loadVar
-    loadValue = load('InitParticles5.mat'); 
+    loadValue = load('InitParticles2.mat'); 
     for i=1:nPop
         
         % Position
