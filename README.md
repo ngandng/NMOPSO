@@ -5,4 +5,4 @@ To run the program, download all the source files and run "NMOPSOmain.m" in MATL
 
 ![Simple scenario](Scen3xy.jpg)
 
-![Complex scenario](Scen5xy.jpg)
+![Complex scenario](Scen6xy.jpg)

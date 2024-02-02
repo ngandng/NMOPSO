@@ -1,8 +1,6 @@
 
 %% Problem Definition
-addpath('~/Desktop/UAV_pathplanning/UAV Path planning/Comparision/Model');
-addpath('~/Desktop/UAV_pathplanning/UAV Path planning/Comparision/Initial Position');
-model = CreateModel6(); % Create search map and parameters
+model = CreateModel(); % Create search map and parameters
 model_name = 6;
 % (in comparision: using model 2,3,5,6)
 
@@ -112,8 +110,8 @@ if loadVar
 else
     % If not load var
     isInit = false;
-    filetime = load(sprintf('InitTimeNMOPSO%d.mat',(model_name)));
-    tic;
+    % filetime = load(sprintf('InitTimeNMOPSO%d.mat',(model_name)));
+    % tic;
     while (~isInit)
         disp('Initialising...');
         for i=1:nPop
@@ -140,15 +138,14 @@ else
             end
         end
     end
-    initTime = toc;
-    initTime = [filetime.initTime, initTime];
-    save(sprintf('InitTimeNMOPSO%d.mat',(model_name)),'initTime');
+    % initTime = toc;
+    % initTime = [filetime.initTime, initTime];
+    % save(sprintf('InitTimeNMOPSO%d.mat',(model_name)),'initTime');
     
     % Save initialiised particle
     % save ('InitParticles5.mat','particle','GlobalBest');
     % return;
 end
-return;
 
 % Array to Hold Best Cost Values at Each Iteration
 BestCost=zeros(MaxIt,nObj);
