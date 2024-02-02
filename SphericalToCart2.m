@@ -21,12 +21,12 @@ dirVector = model.end - model.start;
 phistart = atan2(dirVector(2),dirVector(1));
 psistart = atan2(dirVector(3),norm([dirVector(1),dirVector(2)]));
 
-dir = transfomation_matrix(0,phistart,psistart);
+dir = TransfomationMatrix(0,phistart,psistart);
 startPosition = start*dir;
 
 %% find the position of each particle
 % T is the transformation matrix from start position to i position
-T(1).value = transfomation_matrix(r(1),phi(1),psi(1));
+T(1).value = TransfomationMatrix(r(1),phi(1),psi(1));
 pos(1).value = startPosition*T(1).value;
 
 x(1) = pos(1).value(1,4);
@@ -43,7 +43,7 @@ z(1) = min(model.zmax,z(1));
 
 for i=2:model.n
    
-   T(i).value = T(i-1).value*transfomation_matrix(r(i),phi(i),psi(i));
+   T(i).value = T(i-1).value*TransfomationMatrix(r(i),phi(i),psi(i));
    pos(i).value = startPosition*T(i).value;
   
    x(i) = pos(i).value(1,4);

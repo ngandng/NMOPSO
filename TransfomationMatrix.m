@@ -1,6 +1,6 @@
-function A = transfomation_matrix(r,phi,psi)
+function A = TransfomationMatrix(r,phi,psi)
 
-%syms r; syms phi; syms psi;
+% syms r; syms phi; syms psi;
 %r=1; phi = pi/4; psi = 0;
 
 Rot_z = [ cos(phi), -sin(phi), 0, 0;...

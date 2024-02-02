@@ -1,5 +1,5 @@
 
-function b = Dominates(x, y)
+function b = Dominates(x,y)
 
     if isstruct(x)
         x = x.Cost;

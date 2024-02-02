@@ -45,6 +45,9 @@ function PlotSolution(sol,model,smooth)
     end
     plot3(xyzp(1,:),xyzp(2,:),xyzp(3,:),'k','LineWidth',2);
 
+    for i=2:(N-1)
+       plot3(x_all(i),y_all(i),z_all(i),'ko','MarkerSize',5,'MarkerFaceColor','y');
+    end
     % plot start point
     plot3(x_all(1),y_all(1),z_all(1),'ks','MarkerSize',7,'MarkerFaceColor','k');
     % plot target point
@@ -100,6 +103,10 @@ function PlotSolution(sol,model,smooth)
     % plot path
     plot3(xyzp(1,:),xyzp(2,:),xyzp(3,:),'k','LineWidth',2);
 
+    for i=2:(N-1)
+       plot3(x_all(i),y_all(i),z_all(i),'ko','MarkerSize',5,'MarkerFaceColor','y');
+    end
+
     % plot start point
     plot3(x_all(1),y_all(1),z_all(1),'ks','MarkerSize',7,'MarkerFaceColor','k');
 
@@ -112,7 +119,7 @@ function PlotSolution(sol,model,smooth)
     
     
     %% Plot side view
-    figure(5)
+    figure(7)
     mesh(model.X,model.Y,model.H); % Plot the data
     colormap summer;                    % Default color map.
     set(gca, 'Position', [0 0 1 1]); % Fill the figure window.
@@ -128,6 +135,10 @@ function PlotSolution(sol,model,smooth)
 
     % plot path
     plot3(xyzp(1,:),xyzp(2,:),xyzp(3,:),'k','LineWidth',2);
+
+    for i=2:(N-1)
+       plot3(x_all(i),y_all(i),z_all(i),'ko','MarkerSize',5,'MarkerFaceColor','y');
+    end
 
     % plot start point
     plot3(x_all(1),y_all(1),z_all(1),'ks','MarkerSize',7,'MarkerFaceColor','k');

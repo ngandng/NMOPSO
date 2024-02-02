@@ -2,7 +2,7 @@
 % Calculate path cost
 %
 
-function cost=MyCost(sol,model,varmax)
+function cost=MyCost(sol,model,varmin)
 
     J_inf = inf;
     n = model.n; % n is the number of path node, not including start point
@@ -36,18 +36,19 @@ function cost=MyCost(sol,model,varmax)
     end
     
     %============================================
-    % J1 - Cost for path length    
-    J1 = 0;
-    rmax = varmax.r;
+    % J1 - Cost for path length 
+    Traj = 0;
+    % rmax = varmax.r;
     for i = 1:N-1
         diff = [x_all(i+1) - x_all(i);y_all(i+1) - y_all(i);z_abs(i+1) - z_abs(i)];
-%         if norm(diff)>rmax
-%             J1 = J_inf;
-%         else
-%             J1 = J1 + norm(diff);
-%         end
-        J1 = J1 + norm(diff);
+        if norm(diff) <= varmin.r
+            Traj = 0;
+            break;
+        end
+        Traj = Traj + norm(diff);
     end
+    PP = norm([xf yf zf]-[xs ys zs]);
+    J1 = abs(1 - PP/Traj);
 
     %==============================================
     % J2 - threats/obstacles Cost   
@@ -60,6 +61,7 @@ function cost=MyCost(sol,model,varmax)
     danger_dist = 10*drone_size;
     
     J2 = 0;
+    n2 = 0;
     for i = 1:threat_num
         threat = threats(i,:);
         threat_x = threat(1);
@@ -74,12 +76,13 @@ function cost=MyCost(sol,model,varmax)
             elseif dist < (threat_radius + drone_size)  % Collision
                 threat_cost = J_inf;
             else  % danger
-                threat_cost = (threat_radius + drone_size + danger_dist) - dist;
+                threat_cost = 1 - (dist-drone_size-threat_radius)/danger_dist;
             end
-            
+            n2 = n2+1;
             J2 = J2 + threat_cost;
         end
     end
+    J2 = J2/n2;
 
     %==============================================
     % J3 - Altitude cost
@@ -87,20 +90,23 @@ function cost=MyCost(sol,model,varmax)
     zmax = model.zmax;
     zmin = model.zmin;
     J3 = 0;
+    n3 = 0;
     for i=1:n        
         if z(i) < 0   % crash into ground
             J3_node = J_inf;
         else
             J3_node = abs(z(i) - (zmax + zmin)/2); 
         end
-        
+        J3_node = J3_node/((zmax-zmin)/2);
+        n3 = n3+1;
         J3 = J3 + J3_node;
     end
-    
+    J3 = J3/n3;
+
     %==============================================
     % J4 - Smooth cost
     J4 = 0;
-    
+    n4 = 0;
     %find the heading angle at i position
     for i = 1:N-2   
         % P(ij)P(i,j+1)        
@@ -118,15 +124,18 @@ function cost=MyCost(sol,model,varmax)
                  break;
              end
         end
-       
+
         heading_angle = atan2(norm(cross(segment1,segment2)),dot(segment1,segment2));
-        
+
+        heading_angle = abs(heading_angle)/pi;
+        n4 = n4+1;
         J4 = J4 + abs(heading_angle);
 %         J4 = J4 + abs(climb_angle);
-       
     end
+    J4 = J4/n4;
 
     %============================================
     % Overall cost
+
     cost = [J1;J2;J3;J4];
 end

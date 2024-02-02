@@ -1,13 +1,10 @@
 
-clc;
-clear;
-close all;
-
 %% Problem Definition
-addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Model');
-addpath('C:\Users\nganu\OneDrive\Documents\02. Nghiên cứu\UAV Path planning\Comparision\Initial Position');
-
-model = CreateModel2(); % Create search map and parameters
+addpath('~/Desktop/UAV_pathplanning/UAV Path planning/Comparision/Model');
+addpath('~/Desktop/UAV_pathplanning/UAV Path planning/Comparision/Initial Position');
+model = CreateModel6(); % Create search map and parameters
+model_name = 6;
+% (in comparision: using model 2,3,5,6)
 
 nVar=model.n;       % Number of Decision Variables = searching dimension of PSO = number of path nodes
 
@@ -21,12 +18,11 @@ VarMax.y=model.ymax;
 VarMin.z=model.zmin;           
 VarMax.z=model.zmax;                 
 
-VarMax.r=2*norm(model.start-model.end)/nVar;  % r is distance
-VarMin.r=0;
+VarMax.r=3*norm(model.start-model.end)/nVar;  % r is distance
+VarMin.r=VarMax.r/9;
 
 % Inclination (elevation)
-% AngleRange = pi/4; % Limit the angle range for better solutions
-AngleRange = pi;
+AngleRange = pi/4; % Limit the angle range for better solutions
 VarMin.psi=-AngleRange;            
 VarMax.psi=AngleRange;          
 
@@ -34,7 +30,7 @@ VarMax.psi=AngleRange;
 VarMin.phi=-AngleRange;            
 VarMax.phi=AngleRange;          
 
-% Lower and upper Bounds of velocity
+% Lower and upper Bounds of 
 alpha=0.5;
 VelMax.r=alpha*(VarMax.r-VarMin.r);    
 VelMin.r=-VelMax.r;                    
@@ -43,32 +39,31 @@ VelMin.psi=-VelMax.psi;
 VelMax.phi=alpha*(VarMax.phi-VarMin.phi);    
 VelMin.phi=-VelMax.phi;   
 
-CostFunction=@(x) MyCost(x,model,VarMax);    % Cost Function
+CostFunction=@(x) MyCost(x,model,VarMin);    % Cost Function
 
 %% PSO Parameters
 
-nObj = 4;           % object number
+nObj = 4;             % object number
 
-MaxIt = 5000;          % Maximum Number of Iterations
+MaxIt = 1000;         % Maximum Number of Iterations
 
-nPop=100;           % Population Size (Swarm Size)
+nPop = 100;           % Population Size (Swarm Size)
+        
+nRep = 50;            % Repository Size
 
-nRep = 50;          % Repository Size
+w = 1;                % Inertia Weight
+wdamp = 0.98;         % Inertia Weight Damping Ratio
+c1 = 1.5;             % Personal Learning Coefficient
+c2 = 1.5;             % Global Learning Coefficient
 
-w=1;                % Inertia Weight
-wdamp=0.98;         % Inertia Weight Damping Ratio
-c1=1.5;             % Personal Learning Coefficient
-c2=1.5;             % Global Learning Coefficient
-
-nGrid = 7;            % Number of Grids per Dimension
+nGrid = 5;            % Number of Grids per Dimension
 alpha = 0.1;          % Inflation Rate
 
 beta = 2;             % Leader Selection Pressure
 gamma = 2;            % Deletion Selection Pressure
 
-mu = 1;             % Mutation Rate: higher mu lead to higher mutation probability
-delta = 1;
-
+mu = 0.5;             % Mutation Rate
+delta = 20;           % delta = num(rep)/10
 %% Initialization
 
 % Create Empty Particle Structure
@@ -87,13 +82,11 @@ GlobalBest.Cost=Inf(nObj,1); % Minimization problem
 % Create an empty Particles Matrix, each particle is a solution (searching path)
 particle=repmat(empty_particle,nPop,1);
 
-useMu = 0;
-
 % Addition control parameter
 loadVar = false;
 
 if loadVar
-    loadValue = load('InitParticles6.mat'); 
+    loadValue = load(sprintf('InitParticles%d.mat',(model_name))); 
     for i=1:nPop
         
         % Position
@@ -119,6 +112,8 @@ if loadVar
 else
     % If not load var
     isInit = false;
+    filetime = load(sprintf('InitTimeNMOPSO%d.mat',(model_name)));
+    tic;
     while (~isInit)
         disp('Initialising...');
         for i=1:nPop
@@ -145,20 +140,25 @@ else
             end
         end
     end
+    initTime = toc;
+    initTime = [filetime.initTime, initTime];
+    save(sprintf('InitTimeNMOPSO%d.mat',(model_name)),'initTime');
     
     % Save initialiised particle
-%     save ('InitParticles5.mat','particle','GlobalBest');
+    % save ('InitParticles5.mat','particle','GlobalBest');
     % return;
 end
-
+return;
 
 % Array to Hold Best Cost Values at Each Iteration
 BestCost=zeros(MaxIt,nObj);
 
 % Determine Domination
-particle = DetermineDomination(particle); %return particle.IsDominated is true or false
+particle = DetermineDomination(particle);
 
 rep = particle(~[particle.IsDominated]); % the un-dominated 
+% rep.GridSubIndex = [];
+% rep.GridIndex = [];
 
 Grid = CreateGrid(rep, nGrid, alpha);
 
@@ -166,18 +166,18 @@ for i = 1:numel(rep)
     rep(i) = FindGridIndex(rep(i), Grid);
 end
 
-%rep = subrep;
 %% PSO Main Loop
 
-for it=1:MaxIt
+for it=1:(MaxIt)
 
     % Update Best Cost Ever Found
     BestCost(it,:)=GlobalBest.Cost;
-
+    
     for i=1:nPop   
         
         % select leader = update global best
         GlobalBest = SelectLeader(rep, beta);
+        
         
         % ----------------------r Part--------------------------        
         % Update Velocity
@@ -225,6 +225,7 @@ for it=1:MaxIt
         particle(i).Position.psi = max(particle(i).Position.psi,VarMin.psi);
         particle(i).Position.psi = min(particle(i).Position.psi,VarMax.psi);
 
+        
         % -----------------------Phi part----------------------------------
         % Update Velocity
         particle(i).Velocity.phi = w*particle(i).Velocity.phi ...
@@ -247,22 +248,21 @@ for it=1:MaxIt
         particle(i).Position.phi = min(particle(i).Position.phi,VarMax.phi);
 
                 
-        %------ Evaluation------
+        %----------------------- Evaluation------------------------
         particle(i).Cost=CostFunction(SphericalToCart2(particle(i).Position,model));
         
         %------ Apply mutation-------
-        unique_rep = unique([rep.GridIndex]);
-        pm = (1-(numel(unique_rep)-1)/(numel(rep)-1))^(1/mu); 
+        pm = (1-(it-1)/(MaxIt-1))^(1/mu);
         if rand<pm
-            NewSol.Position = Mutate(particle(i),pm,delta,VarMin,VarMax);
+            NewSol.Position = Mutate(particle(i),rep,delta,VarMax,VarMin);
             NewSol.Cost = CostFunction(SphericalToCart2(NewSol.Position,model));
             if Dominates(NewSol, particle(i))
                 particle(i).Position = NewSol.Position;
                 particle(i).Cost = NewSol.Cost;
-                useMu = useMu+1;                
+
             elseif Dominates(particle(i),NewSol)
                 %do nothing
-                
+
             else
                 if rand < 0.5
                     particle(i).Position = NewSol.Position;
@@ -270,7 +270,6 @@ for it=1:MaxIt
                 end
             end
         end
-
         % Update Personal Best
             
         if Dominates(particle(i), particle(i).Best)
@@ -290,15 +289,17 @@ for it=1:MaxIt
 
     end
     
-    % Add Non-Dominated Particles to REPOSITORY
+    % Determine Domination
+    particle = DetermineDomination(particle);
 
+    % Add Non-Dominated Particles to REPOSITORY
     rep = [rep
          particle(~[particle.IsDominated])]; %#ok
     
     % Determine Domination of New Resository Members
     rep = DetermineDomination(rep);
     
-    % Keep only Non-Dminated Memebrs in the Repository
+    % Keep only Non-Dminated Members in the Repository
     rep = rep(~[rep.IsDominated]);
     
     % Update Grid
@@ -311,31 +312,36 @@ for it=1:MaxIt
     
     % Check if Repository is Full
     if numel(rep)>nRep
-        
         Extra = numel(rep)-nRep;
         for e = 1:Extra
             rep = DeleteOneRepMember(rep, gamma);
-        end
-        
+        end   
     end
+    
+%     numRep(it) = length(unique([rep.GridIndex]));
     
     % Inertia Weight Damping
     w=w*wdamp;
 
-    % Show Iteration Information
+%     Show Iteration Information 
     disp(['Iteration ' num2str(it) ': Best Cost = ' num2str(BestCost(it,:))]);
+%     disp(['Iteration ' num2str(it) ': Number of Repository = ' num2str(numel(rep))]);
 
 end
+
+GlobalBest = SelectLeader(rep, beta);
 
 %% Plot results
 % Best solution
 BestPosition = SphericalToCart2(GlobalBest.Position,model);
-disp('Best solution...');
-smooth = 0.95;
+smooth = 1;
 %smooth = 1;
+
 PlotSolution(BestPosition,model,smooth);
 
-% save ('MOSPSO_Rep2.mat','rep');
+% save result
+% save ('NMOPSOrep.mat','rep');
+% save ('MOSPSO_Result4.mat','BestPosition');
 
 % Best cost  
 %figure;
@@ -351,3 +357,4 @@ PlotSolution(BestPosition,model,smooth);
 %y = BestPosition.y;
 %z = BestPosition.z;
 %plot(x,y,'-ok');
+
