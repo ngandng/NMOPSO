@@ -1,4 +1,4 @@
-
+clc; close; clear all;
 %% Problem Definition
 model = CreateModel(); % Create search map and parameters
 model_name = 6;
@@ -40,9 +40,10 @@ CostFunction=@(x) MyCost(x,model,VarMin);    % Cost Function
 
 %% PSO Parameters
 
-nObj = 4;             % object number
+dummy_output = CostFunction(struct('x', ones(1, model.n), 'y', ones(1, model.n), 'z', ones(1, model.n)));
+nObj = numel(dummy_output);                   % Determine the number of objectives
 
-MaxIt = 1000;         % Maximum Number of Iterations
+MaxIt = 500;          % Maximum Number of Iterations
 
 nPop = 100;           % Population Size (Swarm Size)
         
@@ -79,24 +80,23 @@ GlobalBest.Cost=Inf(nObj,1); % Minimization problem
 % Create an empty Particles Matrix, each particle is a solution (searching path)
 particle=repmat(empty_particle,nPop,1);
 
-% Addition control parameter
-loadVar = false;
-
-if loadVar
-    loadValue = load(sprintf('InitParticles%d.mat',(model_name))); 
+isInit = false;
+% tic;
+while (~isInit)
+    disp('Initialising...');
     for i=1:nPop
-        
-        % Position
-        particle(i).Position  = loadValue.particle(i).Position; 
-        
+
+        % Initialize Position
+        particle(i).Position=CreateRandomSolution(VarSize,VarMin,VarMax);
+
         % Initialize Velocity
         particle(i).Velocity.r=zeros(VarSize);
         particle(i).Velocity.psi=zeros(VarSize);
         particle(i).Velocity.phi=zeros(VarSize);
 
         % Evaluation
-        particle(i).Cost = CostFunction(SphericalToCart2(particle(i).Position,model));
-        
+        particle(i).Cost= CostFunction(SphericalToCart2(particle(i).Position,model));
+
         % Update Personal Best
         particle(i).Best.Position=particle(i).Position;
         particle(i).Best.Cost=particle(i).Cost;
@@ -104,37 +104,7 @@ if loadVar
         % Update Global Best
         if Dominates(particle(i).Best.Cost,GlobalBest.Cost)
             GlobalBest=particle(i).Best;
-        end
-    end
-else
-    % If not load var
-    isInit = false;
-    % filetime = load(sprintf('InitTimeNMOPSO%d.mat',(model_name)));
-    % tic;
-    while (~isInit)
-        disp('Initialising...');
-        for i=1:nPop
-
-            % Initialize Position
-            particle(i).Position=CreateRandomSolution(VarSize,VarMin,VarMax);
-
-            % Initialize Velocity
-            particle(i).Velocity.r=zeros(VarSize);
-            particle(i).Velocity.psi=zeros(VarSize);
-            particle(i).Velocity.phi=zeros(VarSize);
-
-            % Evaluation
-            particle(i).Cost= CostFunction(SphericalToCart2(particle(i).Position,model));
-
-            % Update Personal Best
-            particle(i).Best.Position=particle(i).Position;
-            particle(i).Best.Cost=particle(i).Cost;
-
-            % Update Global Best
-            if Dominates(particle(i).Best.Cost,GlobalBest.Cost)
-                GlobalBest=particle(i).Best;
-                isInit = true;
-            end
+            isInit = true;
         end
     end
 end

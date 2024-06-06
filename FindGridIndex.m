@@ -13,7 +13,7 @@ function particle = FindGridIndex(particle, Grid)
         if isempty(find(particle.Cost(j)<Grid(j).UB, 1, 'first'))
             idx(j) = nGrid;
         else
-            idx(j) = find(particle.Cost(j)<Grid(j).UB, 1, 'first'); % 1 so dau tien thoa man...
+            idx(j) = find(particle.Cost(j)<Grid(j).UB, 1, 'first'); 
         end
     end
     particle.GridSubIndex = idx;

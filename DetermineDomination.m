@@ -18,16 +18,10 @@ function pop = DetermineDomination(pop)
             
             if Dominates(pop(i), pop(j))
                pop(j).IsDominated = true;
-               % if j==51
-               %     disp(['pop ' num2str(j) ' is dominated by ' num2str(i)]);
-               % end
             end
             
             if Dominates(pop(j), pop(i))
                pop(i).IsDominated = true;
-               % if i==51
-               %     disp(['pop ' num2str(i) ' is dominated by ' num2str(j)]);
-               % end
             end
             
         end
@@ -46,7 +40,6 @@ function pop = DetermineDomination(pop)
         
         if Dominates(pop(j), pop(end))
            pop(end).IsDominated = true;
-           % disp('pop end is dominated');
            break;
         end 
     end

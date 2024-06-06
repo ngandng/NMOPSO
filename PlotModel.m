@@ -14,7 +14,6 @@ function PlotModel(model)
     zlabel('z [m]');
     hold on
 
-   
     % Threats as cylinders
     threats = model.threats;
     threat_num = size(threats,1);

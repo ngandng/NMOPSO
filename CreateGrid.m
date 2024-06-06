@@ -3,7 +3,7 @@ function Grid = CreateGrid(pop, nGrid, alpha)
 
     c = [pop.Cost]; 
     
-    cmin = min(c, [], 2); % tim min, max cua tung cost trong rep
+    cmin = min(c, [], 2); 
     cmax = max(c, [], 2);
     
     dc = cmax-cmin;
@@ -18,7 +18,7 @@ function Grid = CreateGrid(pop, nGrid, alpha)
     
     for j = 1:nObj
         
-        cj = linspace(cmin(j), cmax(j), nGrid+1); % tao ra  nGrid+1 diem
+        cj = linspace(cmin(j), cmax(j), nGrid+1); 
         
         Grid(j).LB = [-inf cj];
         Grid(j).UB = [cj +inf];
