@@ -2,7 +2,6 @@
 %% Problem Definition
 model = CreateModel(); % Create search map and parameters
 model_name = 6;
-% (in comparision: using model 2,3,5,6)
 
 nVar=model.n;       % Number of Decision Variables = searching dimension of PSO = number of path nodes
 
@@ -62,8 +61,8 @@ gamma = 2;            % Deletion Selection Pressure
 
 mu = 0.5;             % Mutation Rate
 delta = 20;           % delta = num(rep)/10
-%% Initialization
 
+%% Initialization
 % Create Empty Particle Structure
 empty_particle.Position=[];
 empty_particle.Velocity=[];
@@ -138,13 +137,6 @@ else
             end
         end
     end
-    % initTime = toc;
-    % initTime = [filetime.initTime, initTime];
-    % save(sprintf('InitTimeNMOPSO%d.mat',(model_name)),'initTime');
-    
-    % Save initialiised particle
-    % save ('InitParticles5.mat','particle','GlobalBest');
-    % return;
 end
 
 % Array to Hold Best Cost Values at Each Iteration
@@ -315,15 +307,11 @@ for it=1:(MaxIt)
         end   
     end
     
-%     numRep(it) = length(unique([rep.GridIndex]));
-    
     % Inertia Weight Damping
     w=w*wdamp;
 
 %     Show Iteration Information 
     disp(['Iteration ' num2str(it) ': Best Cost = ' num2str(BestCost(it,:))]);
-%     disp(['Iteration ' num2str(it) ': Number of Repository = ' num2str(numel(rep))]);
-
 end
 
 GlobalBest = SelectLeader(rep, beta);
@@ -332,26 +320,5 @@ GlobalBest = SelectLeader(rep, beta);
 % Best solution
 BestPosition = SphericalToCart2(GlobalBest.Position,model);
 smooth = 1;
-%smooth = 1;
-
 PlotSolution(BestPosition,model,smooth);
-
-% save result
-% save ('NMOPSOrep.mat','rep');
-% save ('MOSPSO_Result4.mat','BestPosition');
-
-% Best cost  
-%figure;
-%subplot(2,2,1);
-%plot(BestCost(1),'LineWidth',2);
-%xlabel('Iteration');
-%ylabel('Best Cost J1');
-%grid on;
-
-
-%figure;
-%x = BestPosition.x;
-%y = BestPosition.y;
-%z = BestPosition.z;
-%plot(x,y,'-ok');
 
