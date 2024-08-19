@@ -22,7 +22,7 @@ Below are visualizations of the NMOPSO algorithm in action for different scenari
 | ![Simple scenario](Scen3xy.jpg) | ![Complex scenario](Scen6xy.jpg) |
 |:---:|:---:|
 
-## Citation
+<!-- ## Citation
 
 If you use this code, please cite the following paper:
 
@@ -34,5 +34,5 @@ If you use this code, please cite the following paper:
   year={2024},
   volume={},
   pages={}
-}
+} -->
 
