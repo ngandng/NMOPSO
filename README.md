@@ -13,7 +13,7 @@ To run the NMOPSO algorithm:
 
 1. Download all the source files from this repository.
 2. Open MATLAB.
-3. Execute the main script by running `NMOPSOmain.m`.
+3. Execute the main script by running `NMOPSO.m`.
 
 ## Visualization
 
