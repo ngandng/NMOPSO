@@ -5,7 +5,7 @@
 This repository contains the source code for the **Navigation Variable-based Multi-objective Particle Swarm Optimization (NMOPSO) algorithm**. The current implementation is designed for path planning of Unmanned Aerial Vehicles (UAVs). However, with modifications, it can be applied to other optimization problems.
 
 The algorithm is described in detail in the paper:
-- **Duong, T.T.N., Bui, DN. & Phung, M.D. Navigation variable-based multi-objective particle swarm optimization for UAV path planning with kinematic constraints. Neural Comput & Applic (2025). [https://doi.org/10.1007/s00521-024-10945-1](https://doi.org/10.1007/s00521-024-10945-1)**
+- *Duong, T.T.N., Bui, DN. & Phung, M.D. Navigation variable-based multi-objective particle swarm optimization for UAV path planning with kinematic constraints. Neural Comput & Applic (2025). [https://doi.org/10.1007/s00521-024-10945-1](https://doi.org/10.1007/s00521-024-10945-1)*
 
 ## Running the Code
 
